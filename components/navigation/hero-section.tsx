@@ -89,6 +89,16 @@ const Icons = {
   ),
 };
 
+// Color palette from your specification
+const colors = {
+  primary: '#033a6d',
+  secondary: '#005c75',
+  tertiary: '#007c8f',
+  quaternary: '#009996',
+  quinary: '#00b3aa',
+  gradient: 'linear-gradient(135deg, #033a6d 0%, #005c75 25%, #007c8f 50%, #009996 75%, #00b3aa 100%)',
+};
+
 // Engineering Company Slides with advanced imagery
 const engineeringSlides: Slide[] = [
   {
@@ -100,7 +110,7 @@ const engineeringSlides: Slide[] = [
     ctaUrl: '#',
     ctaText: 'Explore Projects',
     tag: 'Since 1998',
-    color: '#E67E22',
+    color: colors.primary,
     metrics: [
       { icon: <Icons.Building />, label: 'Completed', value: '380+' },
       { icon: <Icons.Helmet />, label: 'Experts', value: '1,200+' },
@@ -116,7 +126,7 @@ const engineeringSlides: Slide[] = [
     description: 'From conceptual design to final delivery, our engineering team combines technical mastery with creative vision.',
     ctaUrl: '#',
     ctaText: 'Our Services',
-    color: '#2980B9',
+    color: colors.secondary,
     metrics: [
       { icon: <Icons.Ruler />, label: 'Square Meters', value: '2.5M+' },
       { icon: <Icons.Building />, label: 'Projects', value: '450+' },
@@ -132,7 +142,7 @@ const engineeringSlides: Slide[] = [
     description: 'Leading the way in sustainable infrastructure development that connects communities and drives economic growth.',
     ctaUrl: '#',
     ctaText: 'View Portfolio',
-    color: '#27AE60',
+    color: colors.quaternary,
     metrics: [
       { icon: <Icons.Crane />, label: 'Bridges', value: '85' },
       { icon: <Icons.Ruler />, label: 'Highway KM', value: '620' },
@@ -161,10 +171,11 @@ const DigitalCursor = () => {
 
   return (
     <motion.div
-      className="pointer-events-none fixed z-50 h-8 w-8 rounded-sm border-2 border-[#E67E22] dark:mix-blend-difference hidden lg:block"
+      className="pointer-events-none fixed z-50 h-8 w-8 rounded-sm border-2 hidden lg:block"
       style={{
         x: cursorXSpring,
         y: cursorYSpring,
+        borderColor: colors.quaternary,
       }}
     />
   );
@@ -190,9 +201,9 @@ const NavButton = ({
       className={`
         absolute ${direction === 'previous' ? 'left-4' : 'right-4'} 
         top-1/2 z-30 flex h-9 w-9 -translate-y-1/2 items-center justify-center
-        rounded-sm bg-black/30 backdrop-blur-md border border-white/30
-        text-white shadow-lg transition-all hover:bg-black/50 hover:border-[#E67E22]/70
-        focus:outline-none focus:ring-2 focus:ring-[#E67E22] focus:ring-offset-2
+        rounded-sm bg-black/40 backdrop-blur-md border border-white/30
+        text-white shadow-lg transition-all hover:bg-black/60 hover:border-[#00b3aa]/70
+        focus:outline-none focus:ring-2 focus:ring-[#00b3aa] focus:ring-offset-2
         md:h-10 md:w-10
       `}
       aria-label={`${direction} slide`}
@@ -250,14 +261,19 @@ const Indicator = ({
         <div className={`
           h-1.5 rounded-sm transition-all duration-300
           ${current === index 
-            ? 'w-8 bg-[#E67E22]' 
+            ? 'w-8' 
             : 'w-1.5 bg-white/50 group-hover:bg-white/80'
           }
-        `} />
+        `}
+        style={{
+          backgroundColor: current === index ? colors.quaternary : undefined,
+        }}
+        />
         {current === index && (
           <motion.div
             layoutId="activeIndicator"
-            className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#E67E22]"
+            className="absolute -bottom-1 left-0 right-0 h-0.5"
+            style={{ backgroundColor: colors.quaternary }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           />
         )}
@@ -282,7 +298,7 @@ const FeatureChip = ({ text, index }: { text: string; index: number }) => {
       <motion.div
         animate={{ rotate: isHovered ? 360 : 0 }}
         transition={{ duration: 0.5 }}
-        className="text-[#E67E22]"
+        style={{ color: colors.quaternary }}
       >
         <Icons.CheckCircle />
       </motion.div>
@@ -316,7 +332,7 @@ const MetricCard = ({
           scale: isHovered ? 1.2 : 1,
         }}
         transition={{ duration: 0.3 }}
-        className="text-[#E67E22]"
+        style={{ color: colors.quaternary }}
       >
         {icon}
       </motion.div>
@@ -344,6 +360,7 @@ export default function KimiaOmranCarousel({
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const goToSlide = useCallback((index: number) => {
+    if (index === currentIndex) return;
     setDirection(index > currentIndex ? 1 : -1);
     setCurrentIndex(index);
   }, [currentIndex]);
@@ -379,29 +396,26 @@ export default function KimiaOmranCarousel({
     };
   }, [currentIndex, isAutoPlaying, autoPlayInterval, nextSlide]);
 
+  // Keep slides edge-to-edge during transitions (no shrink gaps)
+  const slideTransition = {
+    duration: 0.65,
+    ease: [0.22, 1, 0.36, 1] as const,
+  };
+
   const slideVariants: Variants = {
     enter: (direction: number) => ({
       x: direction > 0 ? '100%' : '-100%',
-      opacity: 0,
-      scale: 0.98,
+      opacity: 1,
     }),
     center: {
       x: 0,
       opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.7,
-        ease: [0.16, 1, 0.3, 1],
-      },
+      transition: slideTransition,
     },
     exit: (direction: number) => ({
       x: direction < 0 ? '100%' : '-100%',
-      opacity: 0,
-      scale: 0.98,
-      transition: {
-        duration: 0.7,
-        ease: [0.16, 1, 0.3, 1],
-      },
+      opacity: 1,
+      transition: slideTransition,
     }),
   };
 
@@ -422,14 +436,15 @@ export default function KimiaOmranCarousel({
     <>
       <DigitalCursor />
       <div 
-        className={`relative w-full overflow-hidden bg-black ${className}`}
+        className={`relative w-full overflow-hidden ${className}`}
+        style={{ backgroundColor: colors.primary }}
         onMouseEnter={() => setIsAutoPlaying(false)}
         onMouseLeave={() => setIsAutoPlaying(autoPlay)}
         aria-roledescription="carousel"
         aria-label="Kimia Omran Engineering Projects"
       >
-        <div className="relative h-115 w-full md:h-125 lg:h-135">
-          <AnimatePresence initial={false} custom={direction} mode="wait">
+        <div className="relative h-[70vh] min-h-[28rem] w-full sm:min-h-[32rem] md:h-[78vh] lg:h-[calc(100vh-88px)] lg:min-h-[42rem]">
+          <AnimatePresence initial={false} custom={direction} mode="sync">
             <motion.div
               key={currentIndex}
               custom={direction}
@@ -438,6 +453,7 @@ export default function KimiaOmranCarousel({
               animate="center"
               exit="exit"
               className="absolute inset-0"
+              style={{ backgroundColor: colors.primary }}
             >
               {/* Background Image */}
               <div className="absolute inset-0">
@@ -446,19 +462,31 @@ export default function KimiaOmranCarousel({
                   alt={slides[currentIndex].imgAlt}
                   fill
                   className="object-cover"
-                  priority
+                  preload={currentIndex === 0}
                   sizes="100vw"
                   quality={90}
                 />
                 
-                {/* Dark industrial overlay */}
-                <div className="absolute inset-0 bg-linear-to-r from-black/70 via-black/50 to-black/70" />
+                {/* Gradient overlay with your colors */}
+                <div 
+                  className="absolute inset-0"
+                  style={{
+                    background: `linear-gradient(135deg, ${colors.primary}CC 0%, ${colors.secondary}CC 40%, ${colors.tertiary}99 70%, transparent 100%)`,
+                  }}
+                />
                 
-                {/* Subtle engineering grid pattern */}
-                <div className="absolute inset-0 bg-[linear-linear(rgba(230,126,34,0.05)_1px,transparent_1px),linear-linear(90deg,rgba(230,126,34,0.05)_1px,transparent_1px)] bg-size-[40px_40px]" />
+                {/* Secondary overlay for better text visibility */}
+                <div className="absolute inset-0 bg-linear-to-t from-black/50 via-black/20 to-transparent" />
                 
-                {/* Accent lighting effect */}
-                <div className="absolute inset-0 bg-linear-to-t from-[#E67E22]/20 via-transparent to-transparent" />
+                {/* Engineering grid pattern with your accent color */}
+                <div 
+                  className="absolute inset-0 bg-[linear-gradient(rgba(0,179,170,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(0,179,170,0.08)_1px,transparent_1px)] bg-[size:40px_40px]"
+                />
+                
+                {/* Accent lighting effect with your colors */}
+                <div 
+                  className="absolute inset-0 bg-linear-to-t from-[#00b3aa]/30 via-transparent to-transparent"
+                />
               </div>
 
               {/* Content Container */}
@@ -487,11 +515,14 @@ export default function KimiaOmranCarousel({
                           repeat: Infinity,
                           ease: "easeInOut",
                         }}
-                        className="text-[#E67E22]"
+                        style={{ color: colors.quaternary }}
                       >
                         <Icons.HardHat />
                       </motion.div>
-                      <span className="text-xs font-mono text-[#E67E22] tracking-wider uppercase">
+                      <span 
+                        className="text-xs font-mono tracking-wider uppercase"
+                        style={{ color: colors.quaternary }}
+                      >
                         {slides[currentIndex].tag || 'Kimia Omran Group'}
                       </span>
                     </motion.div>
@@ -535,12 +566,22 @@ export default function KimiaOmranCarousel({
                       href={slides[currentIndex].ctaUrl}
                       className="
                         inline-flex items-center justify-center gap-2
-                        rounded-sm bg-[#E67E22] px-6 py-3 text-sm font-semibold text-white
-                        shadow-lg transition-all hover:bg-[#D35400] hover:shadow-xl
-                        focus:outline-none focus:ring-2 focus:ring-[#E67E22] focus:ring-offset-2
+                        rounded-sm px-6 py-3 text-sm font-semibold text-white
+                        shadow-lg transition-all hover:shadow-xl
+                        focus:outline-none focus:ring-2 focus:ring-offset-2
                       "
+                      style={{
+                        background: colors.gradient,
+                        boxShadow: `0 4px 20px ${colors.quaternary}40`,
+                      }}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.98 }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.boxShadow = `0 8px 30px ${colors.quaternary}80`;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.boxShadow = `0 4px 20px ${colors.quaternary}40`;
+                      }}
                     >
                       <span>{slides[currentIndex].ctaText}</span>
                       <motion.div
@@ -555,9 +596,10 @@ export default function KimiaOmranCarousel({
                       </motion.div>
                     </motion.a>
 
-                    {/* Industrial Pulse Effect */}
+                    {/* Industrial Pulse Effect with your colors */}
                     <motion.div
-                      className="absolute -bottom-10 left-0 w-40 h-40 bg-[#E67E22]/20 rounded-full blur-3xl"
+                      className="absolute -bottom-10 left-0 w-40 h-40 rounded-full blur-3xl"
+                      style={{ backgroundColor: `${colors.quaternary}40` }}
                       animate={{
                         scale: [1, 1.8, 1],
                         opacity: [0.2, 0.5, 0.2],
@@ -572,11 +614,19 @@ export default function KimiaOmranCarousel({
                 </div>
               </div>
 
-              {/* Industrial Edge Accents */}
-              <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-[#E67E22] to-transparent" />
-              <div className="absolute bottom-0 left-0 w-full h-px bg-linear-to-r from-transparent via-[#E67E22] to-transparent" />
-              <div className="absolute top-0 left-0 w-px h-full bg-linear-to-b from-transparent via-[#E67E22] to-transparent" />
-              <div className="absolute top-0 right-0 w-px h-full bg-linear-to-b from-transparent via-[#E67E22] to-transparent" />
+              {/* Industrial Edge Accents with your colors */}
+              <div 
+                className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-[#00b3aa] to-transparent"
+              />
+              <div 
+                className="absolute bottom-0 left-0 w-full h-px bg-linear-to-r from-transparent via-[#00b3aa] to-transparent"
+              />
+              <div 
+                className="absolute top-0 left-0 w-px h-full bg-linear-to-b from-transparent via-[#00b3aa] to-transparent"
+              />
+              <div 
+                className="absolute top-0 right-0 w-px h-full bg-linear-to-b from-transparent via-[#00b3aa] to-transparent"
+              />
             </motion.div>
           </AnimatePresence>
         </div>
@@ -598,7 +648,7 @@ export default function KimiaOmranCarousel({
           />
         )}
 
-        {/* Progress Bar */}
+        {/* Progress Bar with your gradient colors */}
         {autoPlay && (
           <motion.div
             key={currentIndex}
@@ -608,8 +658,11 @@ export default function KimiaOmranCarousel({
               duration: autoPlayInterval / 1000,
               ease: "linear",
             }}
-            className="absolute bottom-0 left-0 right-0 h-0.5 bg-linear-to-r from-[#E67E22] via-[#F39C12] to-[#E67E22] origin-left"
-            style={{ transformOrigin: '0% 50%' }}
+            className="absolute bottom-0 left-0 right-0 h-0.5 origin-left"
+            style={{
+              background: colors.gradient,
+              transformOrigin: '0% 50%',
+            }}
           />
         )}
       </div>
