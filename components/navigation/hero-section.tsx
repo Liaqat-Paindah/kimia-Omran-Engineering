@@ -443,7 +443,7 @@ export default function KimiaOmranCarousel({
         aria-roledescription="carousel"
         aria-label="Kimia Omran Engineering Projects"
       >
-        <div className="relative h-[70vh] min-h-[28rem] w-full sm:min-h-[32rem] md:h-[78vh] lg:h-[calc(100vh-88px)] lg:min-h-[42rem]">
+        <div className="relative h-[56vh] min-h-88 w-full sm:h-[58vh] sm:min-h-96 md:h-[62vh] lg:h-[68vh] lg:min-h-120">
           <AnimatePresence initial={false} custom={direction} mode="sync">
             <motion.div
               key={currentIndex}
@@ -480,7 +480,7 @@ export default function KimiaOmranCarousel({
                 
                 {/* Engineering grid pattern with your accent color */}
                 <div 
-                  className="absolute inset-0 bg-[linear-gradient(rgba(0,179,170,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(0,179,170,0.08)_1px,transparent_1px)] bg-[size:40px_40px]"
+                  className="absolute inset-0 bg-[linear-gradient(rgba(0,179,170,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(0,179,170,0.08)_1px,transparent_1px)] bg-size-[40px_40px]"
                 />
                 
                 {/* Accent lighting effect with your colors */}
