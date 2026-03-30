@@ -1,11 +1,11 @@
 import HeroSection from "@/components/navigation/hero-section";
-import React from "react";
+import HomePageContent from "@/components/home/page";
 
 const page = () => {
   return (
     <>
-      <HeroSection></HeroSection>
-      <div className="p-24 ">Welcome to Home Page</div>
+      <HeroSection />
+      <HomePageContent />
     </>
   );
 };
