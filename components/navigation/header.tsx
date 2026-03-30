@@ -132,7 +132,7 @@ const Header = () => {
                         <span className="relative z-10">{menuItem.title}</span>
                         {/* Underline Effect */}
                         <span 
-                          className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 transition-all duration-300 group-hover:w-1/2 ${
+                          className={`absolute   ${
                             pathname === menuItem.path ? 'w-1/2' : ''
                           }`}
                           style={{ background: colors.gradient }}
@@ -240,7 +240,7 @@ const Header = () => {
               <ThemeToggler />
 
               <Link
-                href="/journey"
+                href="/login"
                 className="relative group overflow-hidden"
               >
                 <motion.div
