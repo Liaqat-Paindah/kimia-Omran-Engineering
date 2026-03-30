@@ -441,7 +441,7 @@ export default function KimiaOmranServices() {
     <>
       <DigitalCursor />
 
-      <section className="relative w-full overflow-hidden bg-white dark:bg-[#010a12]">
+      <section className="relative w-full overflow-hidden">
         {/* Digital Grid Background */}
         <div className="absolute inset-0">
           <div 

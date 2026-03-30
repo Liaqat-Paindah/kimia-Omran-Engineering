@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/navigation/providers/theme-provider";
+import Footer from "@/components/navigation/footer";
+import Header from "@/components/navigation/header";
 
 const roboto = Roboto({
   weight: "400",
@@ -31,7 +33,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+               <Header></Header>
+      {children}
+      <Footer></Footer>
         </ThemeProvider>
       </body>
     </html>

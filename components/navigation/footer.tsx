@@ -127,7 +127,7 @@ const Footer = () => {
   return (
     <>
       <DigitalCursor />
-      <footer className="relative bg-white dark:bg-[#010a12] border-t border-gray-200 dark:border-[#064e78] overflow-hidden">
+      <footer className="relative  border-t border-gray-200 dark:border-[#064e78] overflow-hidden">
         {/* Digital Grid Background */}
         <div className="absolute inset-0 pointer-events-none">
           <div 
