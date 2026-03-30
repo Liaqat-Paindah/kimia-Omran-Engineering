@@ -43,10 +43,10 @@ const Header = () => {
     <>
       <header
         className={`
-          fixed top-0 left-0 w-full z-[9999] transition-all duration-500 border-b border-gray-200 dark:border-gray-700
+          fixed top-0 left-0 w-full z-[9999] transition-all duration-500 dark:border-gray-700
           ${
             sticky
-              ? "py-1.5 md:py-2 bg-white/90 backdrop-blur-xl border-b border-[#D8F0F4]/20 dark:bg-gray-900 dark:border-[#6ABAE1]/20"
+              ? "py-1.5 md:py-2 bg-white/90 backdrop-blur-xl  dark:bg-gray-900 dark:border-[#6ABAE1]/20"
               : "py-2 md:py-3 lg:py-4 bg-transparent"
           }
         `}
