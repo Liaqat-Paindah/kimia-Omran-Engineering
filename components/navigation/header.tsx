@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import menuData from "./menuData";
-import { ModeToggle } from "./providers/toggleMode";
+import ThemeToggler from "./providers/toggleMode";
 
 const Header = () => {
   const [navbarOpen, setNavbarOpen] = useState(false);
@@ -43,10 +43,10 @@ const Header = () => {
     <>
       <header
         className={`
-          fixed top-0 left-0 w-full z-[9999] transition-all duration-500 border-b border-gray-200 dark:border-gray-700
+          fixed top-0 left-0 w-full z-[9999] transition-all duration-500 dark:border-gray-700
           ${
             sticky
-              ? "py-1.5 md:py-2 bg-white/90 backdrop-blur-xl border-b border-[#D8F0F4]/20 dark:bg-gray-900 dark:border-[#6ABAE1]/20"
+              ? "py-1.5 md:py-2 bg-white/90 backdrop-blur-xl  dark:bg-gray-900 dark:border-[#6ABAE1]/20"
               : "py-2 md:py-3 lg:py-4 bg-transparent"
           }
         `}
@@ -61,7 +61,7 @@ const Header = () => {
               >
                 <div className="absolute inset-0 bg-linear-to-r from-[#6ABAE1] to-[#03396C] blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500" />
                 <Image
-                  src="/logo.jpeg"
+                  src="/logo.png"
                   alt="logo"
                   width={180} // Reduced from 160
                   height={60} // Reduced proportionally
@@ -69,7 +69,7 @@ const Header = () => {
                   priority
                 />
                 <Image
-                  src="/logo.jpeg"
+                  src="/logo.png"
                   alt="logo"
                   width={180} // Reduced from 160
                   height={60} // Reduced proportionally
@@ -197,7 +197,7 @@ const Header = () => {
               <div className="relative scale-90 md:scale-100"></div>
 
               <div className="hidden md:flex md:items-center md:space-x-1.5">
-                <ModeToggle />
+                <ThemeToggler />
 
                 <Link
                   href="/journey"
