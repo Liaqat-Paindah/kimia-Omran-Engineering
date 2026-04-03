@@ -1,23 +1,30 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import User from "@/models/user";
 import { ConnectDB } from "@/lib/config";
+
+const loginSchema = z.object({
+  email: z.string().email().trim().toLowerCase(),
+  password: z.string().min(6),
+});
 
 export async function POST(req: Request) {
   try {
     await ConnectDB();
-    const { email, password } = await req.json();
-    if (!email || !password) {
+
+    const parsedBody = loginSchema.safeParse(await req.json());
+
+    if (!parsedBody.success) {
       return NextResponse.json(
         {
           success: false,
-          message: "Email and password are required",
+          message: "A valid email and password are required",
         },
         { status: 400 },
       );
     }
 
-    const normalizedEmail = email.toLowerCase().trim();
-    const user = await User.findOne({ email: normalizedEmail });
+    const user = await User.findOne({ email: parsedBody.data.email });
 
     if (!user) {
       return NextResponse.json(
@@ -29,7 +36,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const isValidPassword = await user.comparePassword(password);
+    const isValidPassword = await user.comparePassword(parsedBody.data.password);
 
     if (!isValidPassword) {
       return NextResponse.json(
@@ -45,10 +52,11 @@ export async function POST(req: Request) {
         success: true,
         message: "Login successful",
         user: {
-          _id: user._id.toString(),
+          id: user._id.toString(),
           email: user.email,
-          first_name: user.first_name,
-          last_name: user.last_name,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
           avatar: user.avatar ?? null,
         },
       },

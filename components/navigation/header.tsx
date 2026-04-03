@@ -3,7 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
+import SignOutButton from "@/components/sign-out-button";
 import menuData from "./menuData";
 import ThemeToggler from "./providers/toggleMode";
 
@@ -26,6 +28,10 @@ const Header = () => {
   };
 
   const pathname = usePathname();
+  const { data: session, status } = useSession();
+  const isAuthenticated = status === "authenticated" && !!session?.user;
+  const sessionLabel =
+    session?.user.firstName || session?.user.name || "Dashboard";
 
   const [sticky, setSticky] = useState(false);
   const handleStickyNavbar = useCallback(() => {
@@ -232,21 +238,44 @@ const Header = () => {
             <div className="flex items-center space-x-3">
               <ThemeToggler />
 
-              <Link href="/login" className="relative group overflow-hidden">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="relative px-4 py-2 text-sm font-medium text-white rounded-sm"
-                  style={{ background: colors.gradient }}
-                >
-                  <span className="relative z-10">Sign In</span>
-                  {/* Shine Effect */}
-                  <motion.div
-                    className="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-700"
-                    style={{ filter: "blur(4px)" }}
+              {status === "loading" ? (
+                <div
+                  className="hidden h-10 w-28 rounded-sm border lg:block"
+                  style={{ borderColor: `${colors.quinary}30` }}
+                />
+              ) : isAuthenticated ? (
+                <div className="hidden items-center gap-3 lg:flex">
+                  <Link
+                    href="/dashboard"
+                    className="rounded-sm border px-4 py-2 text-sm font-medium transition-colors hover:text-[#00b3aa]"
+                    style={{ borderColor: `${colors.quinary}30` }}
+                  >
+                    {sessionLabel}
+                  </Link>
+                  <SignOutButton
+                    className="rounded-sm bg-[#033a6d] px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                    redirectTo="/login"
                   />
-                </motion.div>
-              </Link>
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  className="relative hidden overflow-hidden group lg:block"
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="relative rounded-sm px-4 py-2 text-sm font-medium text-white"
+                    style={{ background: colors.gradient }}
+                  >
+                    <span className="relative z-10">Sign In</span>
+                    <motion.div
+                      className="absolute inset-0 bg-white/20 -translate-x-full transition-transform duration-700 group-hover:translate-x-full"
+                      style={{ filter: "blur(4px)" }}
+                    />
+                  </motion.div>
+                </Link>
+              )}
 
               {/* Mobile Menu Toggle */}
               <button
@@ -427,19 +456,36 @@ const Header = () => {
                         </li>
                       ))}
 
-                      {/* Mobile Sign In Button */}
+                      {/* Mobile Auth Actions */}
                       <li
                         className="pt-4 mt-2 border-t"
                         style={{ borderColor: `${colors.quinary}20` }}
                       >
-                        <Link
-                          href="/journey"
-                          onClick={() => setNavbarOpen(false)}
-                          className="flex w-full items-center justify-center px-4 py-3 rounded-sm text-sm font-medium text-white transition-all duration-300 hover:shadow-lg"
-                          style={{ background: colors.gradient }}
-                        >
-                          Sign In
-                        </Link>
+                        {isAuthenticated ? (
+                          <div className="space-y-3">
+                            <Link
+                              href="/dashboard"
+                              onClick={() => setNavbarOpen(false)}
+                              className="flex w-full items-center justify-center rounded-sm border px-4 py-3 text-sm font-medium transition-all duration-300 hover:text-[#00b3aa]"
+                              style={{ borderColor: `${colors.quinary}30` }}
+                            >
+                              Dashboard
+                            </Link>
+                            <SignOutButton
+                              className="flex w-full items-center justify-center rounded-sm bg-[#033a6d] px-4 py-3 text-sm font-medium text-white transition-all duration-300 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                              redirectTo="/login"
+                            />
+                          </div>
+                        ) : (
+                          <Link
+                            href="/login"
+                            onClick={() => setNavbarOpen(false)}
+                            className="flex w-full items-center justify-center rounded-sm px-4 py-3 text-sm font-medium text-white transition-all duration-300 hover:shadow-lg"
+                            style={{ background: colors.gradient }}
+                          >
+                            Sign In
+                          </Link>
+                        )}
                       </li>
                     </ul>
                   </nav>
