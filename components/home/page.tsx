@@ -169,9 +169,9 @@ const ProjectCard = ({ title, category, image, index }: { title: string; categor
 // Main Landing Page
 export default function KimiaOmranLanding() {
   const features = [
-    { icon: <Icons.Construction />, title: "General Contracting", description: "Full-service construction management with uncompromising quality." },
+    { icon: <Icons.Construction />, title: "General Contracting", description: "Full-service construction management with quality." },
     { icon: <Icons.Engineering />, title: "Structural Engineering", description: "Advanced seismic-resistant solutions using cutting-edge BIM technology." },
-    { icon: <Icons.Sustainability />, title: "Sustainable Solutions", description: "Eco-friendly construction methods for environmentally responsible projects." },
+    { icon: <Icons.Sustainability />, title: "Sustainable Solutions", description: "Eco-friendly construction methods for responsible projects." },
     { icon: <Icons.Quality />, title: "Quality Control", description: "Rigorous testing and inspection to ensure highest standards." },
   ];
 
@@ -251,7 +251,7 @@ export default function KimiaOmranLanding() {
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="max-w-3xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Ready to Build Your Future?</h2>
             <p className="text-white/80 mb-8">Let`s discuss how Kimia Omran can bring your vision to life with our engineering expertise.</p>
-            <motion.a whileHover={{ scale: 1.05 }} href="#contact" className="inline-flex items-center gap-2 px-8 py-4 rounded-sm font-semibold text-lg" style={{ background: 'white', color: colors.primary }}>
+            <motion.a whileHover={{ scale: 1.05 }} href="/contact" className="inline-flex items-center gap-2 px-8 py-4 rounded-sm font-semibold text-lg" style={{ background: 'white', color: colors.primary }}>
               Get a Free Consultation <Icons.ArrowRight />
             </motion.a>
           </motion.div>

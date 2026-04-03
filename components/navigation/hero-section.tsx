@@ -103,7 +103,7 @@ const colors = {
 const engineeringSlides: Slide[] = [
   {
     id: 'kimia-1',
-    imgSrc: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=2070&auto=format&fit=crop',
+    imgSrc: '/slider/slider-1.jpeg',
     imgAlt: 'Modern skyscraper construction site with tower cranes against sunset',
     title: 'Building Tomorrow\'s Landmarks',
     description: 'Kimia Omran delivers world-class engineering solutions with precision, innovation, and unmatched quality in every project.',
@@ -120,7 +120,7 @@ const engineeringSlides: Slide[] = [
   },
   {
     id: 'kimia-2',
-    imgSrc: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?q=80&w=2070&auto=format&fit=crop',
+    imgSrc: '/slider/slider-2.jpeg',
     imgAlt: 'Architectural blueprint with modern office building in background',
     title: 'Engineering Excellence',
     description: 'From conceptual design to final delivery, our engineering team combines technical mastery with creative vision.',
@@ -136,7 +136,7 @@ const engineeringSlides: Slide[] = [
   },
   {
     id: 'kimia-3',
-    imgSrc: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=2070&auto=format&fit=crop',
+    imgSrc: '/slider/slider-3.jpg',
     imgAlt: 'Aerial view of massive infrastructure project with highways and bridges',
     title: 'Infrastructure for the Future',
     description: 'Leading the way in sustainable infrastructure development that connects communities and drives economic growth.',
