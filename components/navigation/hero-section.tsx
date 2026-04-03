@@ -461,10 +461,8 @@ export default function KimiaOmranCarousel({
                   src={slides[currentIndex].imgSrc}
                   alt={slides[currentIndex].imgAlt}
                   fill
-                  className="object-cover"
                   preload={currentIndex === 0}
                   sizes="100vw"
-                  quality={90}
                 />
                 
                 {/* Gradient overlay with your colors */}
