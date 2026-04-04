@@ -3,8 +3,6 @@ import { Roboto } from "next/font/google";
 import "./globals.css";
 import AuthSessionProvider from "@/components/auth-session-provider";
 import { ThemeProvider } from "@/components/navigation/providers/theme-provider";
-import Footer from "@/components/navigation/footer";
-import Header from "@/components/navigation/header";
 
 const roboto = Roboto({
   weight: "400",
@@ -35,9 +33,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthSessionProvider>
-            <Header />
             {children}
-            <Footer />
           </AuthSessionProvider>
         </ThemeProvider>
       </body>

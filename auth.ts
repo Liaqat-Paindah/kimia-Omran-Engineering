@@ -10,8 +10,8 @@ import client from "@/lib/mongoDB";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: {
-    signIn: "/auth/login",
-    error: "/auth/login",
+    signIn: "/login",
+    error: "/login",
   },
   session: {
     strategy: "jwt",
@@ -68,10 +68,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const firstName = payload.user.firstName ?? "";
         const lastName = payload.user.lastName ?? "";
         const avatar = payload.user.avatar ?? null;
+        const userId = payload.user._id ?? payload.user.id;
 
         return {
-          id: payload.user._id,
-          _id: payload.user._id,
+          id: userId,
+          _id: userId,
           email: payload.user.email,
           firstName,
           lastName,
@@ -84,17 +85,31 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, session }) {
       if (user) {
         token._id = user._id;
         token.email = user.email ?? token.email;
         token.firstName = user.firstName ?? null;
         token.lastName = user.lastName ?? null;
+        token.role = user.role ?? "user";
         token.avatar = user.avatar ?? null;
         token.name =
           [user.firstName, user.lastName].filter(Boolean).join(" ") ||
           token.name;
         token.picture = user.avatar ?? token.picture;
+      }
+
+      if (session) {
+        token.email = session.email ?? token.email;
+        token.firstName = session.firstName ?? token.firstName;
+        token.lastName = session.lastName ?? token.lastName;
+        token.role = session.role ?? token.role;
+        token.avatar = session.avatar ?? token.avatar;
+        token.name =
+          [session.firstName, session.lastName]
+            .filter(Boolean)
+            .join(" ") || token.name;
+        token.picture = session.avatar ?? token.picture;
       }
 
       return token;
@@ -107,7 +122,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.firstName =
           token.firstName ?? session.user.firstName ?? null;
         session.user.lastName = token.lastName ?? session.user.lastName ?? null;
+        session.user.role = token.role ?? session.user.role ?? "user";
         session.user.avatar = token.avatar ?? null;
+        session.user.name =
+          [session.user.firstName, session.user.lastName]
+            .filter(Boolean)
+            .join(" ") || session.user.name;
+        session.user.image = token.avatar ?? session.user.image ?? null;
       }
 
       return session;

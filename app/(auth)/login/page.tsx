@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import LoginPageClient from "@/components/auth/login-page-client";
+import AdminLoginPageClient from "@/components/admin-login-page-client";
 
 export default async function LoginPage() {
   const session = await auth();
@@ -9,5 +9,5 @@ export default async function LoginPage() {
     redirect("/dashboard");
   }
 
-  return <LoginPageClient />;
+  return <AdminLoginPageClient />;
 }
