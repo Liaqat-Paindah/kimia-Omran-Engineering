@@ -43,15 +43,15 @@ export default function AccountSettingsSection({
           <div className="grid gap-4 md:grid-cols-2">
             <input
               className={inputClass}
-              name="firstName"
-              value={accountForm.firstName}
+              name="first_name"
+              value={accountForm.first_name}
               onChange={onAccountChange}
               placeholder="First name"
             />
             <input
               className={inputClass}
-              name="lastName"
-              value={accountForm.lastName}
+              name="last_name"
+              value={accountForm.last_name}
               onChange={onAccountChange}
               placeholder="Last name"
             />

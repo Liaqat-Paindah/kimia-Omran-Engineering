@@ -67,9 +67,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const userId = String(payload.user._id ?? payload.user.id ?? "");
         const firstName =
-          payload.user.firstName ?? payload.user.first_name ?? null;
+          payload.user.first_name ?? payload.user.firstName ?? null;
         const lastName =
-          payload.user.lastName ?? payload.user.last_name ?? null;
+          payload.user.last_name ?? payload.user.lastName ?? null;
         const avatar = payload.user.avatar ?? payload.user.image ?? null;
         const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
 
@@ -93,8 +93,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user, session }) {
       if (user) {
         const userId = user.id ?? user._id ?? token.sub ?? undefined;
-        const firstName = user.firstName ?? user.first_name ?? null;
-        const lastName = user.lastName ?? user.last_name ?? null;
+        const firstName = user.first_name ?? user.firstName ?? null;
+        const lastName = user.last_name ?? user.lastName ?? null;
         const avatar = user.avatar ?? user.image ?? null;
 
         token.id = userId;
@@ -113,18 +113,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       if (session) {
         const firstName =
-          session.firstName ??
           session.first_name ??
-          session.user?.firstName ??
           session.user?.first_name ??
+          session.firstName ??
+          session.user?.firstName ??
           token.firstName ??
           token.first_name ??
           null;
         const lastName =
-          session.lastName ??
           session.last_name ??
-          session.user?.lastName ??
           session.user?.last_name ??
+          session.lastName ??
+          session.user?.lastName ??
           token.lastName ??
           token.last_name ??
           null;
@@ -142,6 +142,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.last_name = lastName;
         token.role = session.role ?? session.user?.role ?? token.role;
         token.avatar = avatar;
+        token.name = [firstName, lastName].filter(Boolean).join(" ") || token.name;
         token.picture = avatar ?? token.picture;
       }
 
@@ -150,12 +151,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
     async session({ session, token }) {
       if (session.user) {
-        const firstName = token.firstName ?? token.first_name ?? null;
-        const lastName = token.lastName ?? token.last_name ?? null;
+        const firstName = token.first_name ?? token.firstName ?? null;
+        const lastName = token.last_name ?? token.lastName ?? null;
 
         session.user.id = token.id ?? token.sub ?? session.user.id;
         session.user._id = token._id;
         session.user.email = token.email ?? session.user.email ?? null;
+        session.firstName = firstName;
+        session.lastName = lastName;
+        session.first_name = firstName;
+        session.last_name = lastName;
+        session.avatar = token.avatar ?? null;
+        session.role = token.role ?? "user";
         session.user.firstName = firstName;
         session.user.lastName = lastName;
         session.user.first_name = firstName;

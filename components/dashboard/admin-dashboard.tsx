@@ -268,8 +268,8 @@ export default function AdminDashboard({
 
     await update({
       email: payload.account.email,
-      firstName: payload.account.firstName,
-      lastName: payload.account.lastName,
+      first_name: payload.account.first_name,
+      last_name: payload.account.last_name,
       role: payload.account.role,
       avatar: payload.account.avatar,
     });
@@ -387,7 +387,7 @@ export default function AdminDashboard({
                 Signed in as
               </p>
               <p className="mt-2 text-xl font-semibold">
-                {accountForm.firstName} {accountForm.lastName}
+                {accountForm.first_name} {accountForm.last_name}
               </p>
               <p className="mt-1 text-sm text-slate-300">{accountForm.email}</p>
               <div className="mt-5 flex flex-wrap items-center gap-3">

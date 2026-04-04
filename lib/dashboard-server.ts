@@ -26,13 +26,29 @@ export async function requireAdminSession() {
 
 export async function getDashboardAccount() {
   const session = await requireAdminSession();
-  const account = await User.findById(session.user._id);
+  const normalizedEmail = session.user.email?.toLowerCase() ?? "";
+  const account =
+    (normalizedEmail
+      ? await User.findOne({ email: normalizedEmail }).lean()
+      : null) ??
+    (session.user._id ? await User.findById(session.user._id).lean() : null);
+
+  const sessionFirstName =
+    session.user.first_name ??
+    session.user.firstName ??
+    session.user.name?.split(" ").filter(Boolean)[0] ??
+    "";
+  const sessionLastName =
+    session.user.last_name ??
+    session.user.lastName ??
+    session.user.name?.split(" ").filter(Boolean).slice(1).join(" ") ??
+    "";
 
   return serializeAccount(
     account ?? {
       id: session.user._id,
-      firstName: session.user.firstName,
-      lastName: session.user.lastName,
+      first_name: sessionFirstName,
+      last_name: sessionLastName,
       email: session.user.email,
       avatar: session.user.avatar,
       role: session.user.role,

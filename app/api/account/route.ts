@@ -6,12 +6,21 @@ import { serializeAccount } from "@/lib/admin-dashboard";
 import { ConnectDB } from "@/lib/config";
 import User from "@/models/user";
 
-const accountSchema = z.object({
-  firstName: z.string().trim().min(2, "First name is required."),
-  lastName: z.string().trim().min(2, "Last name is required."),
-  email: z.string().trim().email("A valid email is required."),
-  avatar: z.string().trim().optional().default(""),
-});
+const accountSchema = z
+  .object({
+    first_name: z.string().trim().min(2, "First name is required.").optional(),
+    last_name: z.string().trim().min(2, "Last name is required.").optional(),
+    firstName: z.string().trim().min(2, "First name is required.").optional(),
+    lastName: z.string().trim().min(2, "Last name is required.").optional(),
+    email: z.string().trim().email("A valid email is required."),
+    avatar: z.string().trim().optional().default(""),
+  })
+  .transform((data) => ({
+    first_name: data.first_name ?? data.firstName ?? "",
+    last_name: data.last_name ?? data.lastName ?? "",
+    email: data.email,
+    avatar: data.avatar,
+  }));
 
 async function requireAdmin() {
   const session = await auth();
@@ -56,6 +65,7 @@ export async function GET() {
   await ConnectDB();
 
   const user = await User.findById(session.user._id);
+  console.log("Fetched user for account overview:", user);
 
   if (!user) {
     return NextResponse.json({ message: "User not found." }, { status: 404 });
@@ -106,8 +116,8 @@ export async function PATCH(request: Request) {
   const user = await User.findByIdAndUpdate(
     session.user._id,
     {
-      first_name: parsed.data.firstName,
-      last_name: parsed.data.lastName,
+      first_name: parsed.data.first_name,
+      last_name: parsed.data.last_name,
       email: parsed.data.email.toLowerCase(),
       avatar: parsed.data.avatar,
     },

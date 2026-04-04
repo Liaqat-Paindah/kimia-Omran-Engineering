@@ -14,8 +14,8 @@ export type DashboardProject = {
 
 export type DashboardAccount = {
   id: string;
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   email: string;
   avatar: string;
   role: string;
@@ -139,14 +139,19 @@ export function serializeAccount(user: {
   last_name?: string | null;
   email?: string | null;
   avatar?: string | null;
+  image?: string | null;
   role?: string | null;
 }) {
+  const firstName = user.firstName ?? user.first_name ?? "";
+  const lastName = user.lastName ?? user.last_name ?? "";
+  const avatar = user.avatar ?? user.image ?? "";
+
   return {
     id: user._id?.toString() ?? user.id ?? "",
-    firstName: user.firstName ?? user.first_name ?? "",
-    lastName: user.lastName ?? user.last_name ?? "",
+    first_name: firstName,
+    last_name: lastName,
     email: user.email ?? "",
-    avatar: user.avatar ?? "",
+    avatar,
     role: user.role ?? "user",
   } satisfies DashboardAccount;
 }

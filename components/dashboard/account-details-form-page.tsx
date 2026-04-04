@@ -67,8 +67,8 @@ export default function AccountDetailsFormPage({
 
     await update({
       email: payload.account.email,
-      firstName: payload.account.firstName,
-      lastName: payload.account.lastName,
+      first_name: payload.account.first_name,
+      last_name: payload.account.last_name,
       role: payload.account.role,
       avatar: payload.account.avatar,
     });
@@ -105,15 +105,15 @@ export default function AccountDetailsFormPage({
           <div className="grid gap-4 md:grid-cols-2">
             <input
               className={inputClass}
-              name="firstName"
-              value={accountForm.firstName}
+              name="first_name"
+              value={accountForm.first_name}
               onChange={handleChange}
               placeholder="First name"
             />
             <input
               className={inputClass}
-              name="lastName"
-              value={accountForm.lastName}
+              name="last_name"
+              value={accountForm.last_name}
               onChange={handleChange}
               placeholder="Last name"
             />
