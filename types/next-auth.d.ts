@@ -1,32 +1,32 @@
 import type { DefaultSession, DefaultUser } from "next-auth";
 
-declare module "next-auth" {
-  interface Session {
-    user: {
-      id: string;
-      role: string;
-      firstName: string;
-      lastName: string;
-      avatar?: string | null;
-    } & DefaultSession["user"];
-  }
+type UserRole = "user" | "admin";
 
-  interface User extends DefaultUser {
-    role: string;
-    firstName: string;
-    lastName: string;
-    avatar?: string | null;
+interface AuthProfileFields {
+  id?: string;
+  _id?: string;
+  role?: UserRole;
+  avatar?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+}
+
+declare module "next-auth" {
+  interface User extends DefaultUser, AuthProfileFields {}
+
+  interface Session extends AuthProfileFields {
+    user: DefaultSession["user"] & AuthProfileFields;
   }
 }
 
 declare module "next-auth/jwt" {
-  interface JWT {
-    id?: string;
-    role?: string;
-    firstName?: string;
-    lastName?: string;
-    avatar?: string | null;
-  }
+  interface JWT extends AuthProfileFields {}
+}
+
+declare module "@auth/core/jwt" {
+  interface JWT extends AuthProfileFields {}
 }
 
 export {};

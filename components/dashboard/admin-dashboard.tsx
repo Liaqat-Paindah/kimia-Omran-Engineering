@@ -10,6 +10,7 @@ import AccountSettingsSection from "@/components/dashboard/account-settings-sect
 import ProjectsSection from "@/components/dashboard/projects-section";
 import ToastStack, { type ToastItem } from "@/components/ui/toast-stack";
 import {
+  createToastId,
   createProjectSlug,
   getDateInputValue,
   type DashboardAccount,
@@ -91,7 +92,7 @@ export default function AdminDashboard({
   };
 
   const showToast = (toast: Omit<ToastItem, "id">) => {
-    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const id = createToastId();
     setToasts((current) => [...current, { id, ...toast }]);
   };
 

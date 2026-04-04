@@ -40,6 +40,23 @@ export type DashboardPasswordForm = {
   confirmPassword: string;
 };
 
+export const emptyProjectForm: DashboardProjectForm = {
+  name: "",
+  slug: "",
+  description: "",
+  image: "",
+  startDate: "",
+  endDate: "",
+  location: "",
+  constructionType: "",
+};
+
+export const emptyPasswordForm: DashboardPasswordForm = {
+  currentPassword: "",
+  newPassword: "",
+  confirmPassword: "",
+};
+
 export function createProjectSlug(value: string) {
   return value
     .toLowerCase()
@@ -47,6 +64,13 @@ export function createProjectSlug(value: string) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .replace(/-{2,}/g, "-");
+}
+
+let toastIdCounter = 0;
+
+export function createToastId() {
+  toastIdCounter += 1;
+  return `toast-${toastIdCounter}`;
 }
 
 export function getDateInputValue(value: string) {
@@ -62,6 +86,19 @@ export function formatDashboardDate(value: string) {
   }
 
   return `${day}/${month}/${year}`;
+}
+
+export function projectToForm(project: DashboardProject): DashboardProjectForm {
+  return {
+    name: project.name,
+    slug: project.slug,
+    description: project.description,
+    image: project.image,
+    startDate: getDateInputValue(project.startDate),
+    endDate: getDateInputValue(project.endDate),
+    location: project.location,
+    constructionType: project.constructionType,
+  };
 }
 
 export function serializeProject(project: {
@@ -98,14 +135,16 @@ export function serializeAccount(user: {
   id?: string;
   firstName?: string | null;
   lastName?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
   email?: string | null;
   avatar?: string | null;
   role?: string | null;
 }) {
   return {
     id: user._id?.toString() ?? user.id ?? "",
-    firstName: user.firstName ?? "",
-    lastName: user.lastName ?? "",
+    firstName: user.firstName ?? user.first_name ?? "",
+    lastName: user.lastName ?? user.last_name ?? "",
     email: user.email ?? "",
     avatar: user.avatar ?? "",
     role: user.role ?? "user",

@@ -65,10 +65,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
-        const firstName = payload.user.firstName ?? "";
-        const lastName = payload.user.lastName ?? "";
-        const avatar = payload.user.avatar ?? null;
-        const userId = payload.user._id ?? payload.user.id;
+        const userId = String(payload.user._id ?? payload.user.id ?? "");
+        const firstName =
+          payload.user.firstName ?? payload.user.first_name ?? null;
+        const lastName =
+          payload.user.lastName ?? payload.user.last_name ?? null;
+        const avatar = payload.user.avatar ?? payload.user.image ?? null;
+        const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
 
         return {
           id: userId,
@@ -76,10 +79,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: payload.user.email,
           firstName,
           lastName,
-          role: payload.user.role,
+          first_name: firstName,
+          last_name: lastName,
+          role: payload.user.role ?? "user",
           avatar,
-          name: [firstName, lastName].filter(Boolean).join(" ") || null,
           image: avatar,
+          name: fullName || (payload.user.email ?? null),
         };
       },
     }),
@@ -87,29 +92,57 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     async jwt({ token, user, session }) {
       if (user) {
-        token._id = user._id;
+        const userId = user.id ?? user._id ?? token.sub ?? undefined;
+        const firstName = user.firstName ?? user.first_name ?? null;
+        const lastName = user.lastName ?? user.last_name ?? null;
+        const avatar = user.avatar ?? user.image ?? null;
+
+        token.id = userId;
+        token.sub = userId;
+        token._id = user._id ?? userId;
         token.email = user.email ?? token.email;
-        token.firstName = user.firstName ?? null;
-        token.lastName = user.lastName ?? null;
+        token.firstName = firstName;
+        token.lastName = lastName;
+        token.first_name = firstName;
+        token.last_name = lastName;
         token.role = user.role ?? "user";
-        token.avatar = user.avatar ?? null;
-        token.name =
-          [user.firstName, user.lastName].filter(Boolean).join(" ") ||
-          token.name;
-        token.picture = user.avatar ?? token.picture;
+        token.avatar = avatar;
+        token.name = [firstName, lastName].filter(Boolean).join(" ") || token.name;
+        token.picture = avatar ?? token.picture;
       }
 
       if (session) {
-        token.email = session.email ?? token.email;
-        token.firstName = session.firstName ?? token.firstName;
-        token.lastName = session.lastName ?? token.lastName;
-        token.role = session.role ?? token.role;
-        token.avatar = session.avatar ?? token.avatar;
-        token.name =
-          [session.firstName, session.lastName]
-            .filter(Boolean)
-            .join(" ") || token.name;
-        token.picture = session.avatar ?? token.picture;
+        const firstName =
+          session.firstName ??
+          session.first_name ??
+          session.user?.firstName ??
+          session.user?.first_name ??
+          token.firstName ??
+          token.first_name ??
+          null;
+        const lastName =
+          session.lastName ??
+          session.last_name ??
+          session.user?.lastName ??
+          session.user?.last_name ??
+          token.lastName ??
+          token.last_name ??
+          null;
+        const avatar =
+          session.avatar ??
+          session.user?.avatar ??
+          session.user?.image ??
+          token.avatar ??
+          null;
+
+        token.email = session.email ?? session.user?.email ?? token.email;
+        token.firstName = firstName;
+        token.lastName = lastName;
+        token.first_name = firstName;
+        token.last_name = lastName;
+        token.role = session.role ?? session.user?.role ?? token.role;
+        token.avatar = avatar;
+        token.picture = avatar ?? token.picture;
       }
 
       return token;
@@ -117,18 +150,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
     async session({ session, token }) {
       if (session.user) {
+        const firstName = token.firstName ?? token.first_name ?? null;
+        const lastName = token.lastName ?? token.last_name ?? null;
+
+        session.user.id = token.id ?? token.sub ?? session.user.id;
         session.user._id = token._id;
         session.user.email = token.email ?? session.user.email ?? null;
-        session.user.firstName =
-          token.firstName ?? session.user.firstName ?? null;
-        session.user.lastName = token.lastName ?? session.user.lastName ?? null;
+        session.user.firstName = firstName;
+        session.user.lastName = lastName;
+        session.user.first_name = firstName;
+        session.user.last_name = lastName;
         session.user.role = token.role ?? session.user.role ?? "user";
         session.user.avatar = token.avatar ?? null;
-        session.user.name =
-          [session.user.firstName, session.user.lastName]
-            .filter(Boolean)
-            .join(" ") || session.user.name;
         session.user.image = token.avatar ?? session.user.image ?? null;
+        session.user.name =
+          [firstName, lastName].filter(Boolean).join(" ") || session.user.name;
       }
 
       return session;

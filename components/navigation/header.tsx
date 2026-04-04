@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,11 +23,11 @@ const colors = {
 };
 
 const dashboardMenuData: Menu[] = [
-  { id: 101, title: "Project", path: "/dashboard", newTab: false },
+  { id: 101, title: "Project", path: "/dashboard/projects", newTab: false },
   {
     id: 102,
     title: "Account Setting",
-    path: "/dashboard?tab=account",
+    path: "/dashboard/account",
     newTab: false,
   },
 ];
@@ -39,16 +39,17 @@ const Header = () => {
   };
 
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const { data: session, status } = useSession();
+
   const isAuthenticated = status === "authenticated" && !!session?.user;
   const sessionLabel =
-    session?.user.firstName || session?.user.name || "Dashboard";
+    session?.user.firstName ||
+    session?.user.first_name ||
+    session?.user.name ||
+    "user";
   const isDashboardRoute = pathname.startsWith("/dashboard");
-  const activeDashboardTab =
-    searchParams.get("tab") === "account" ? "account" : "projects";
   const activeMenuItems = isDashboardRoute ? dashboardMenuData : menuData;
-  const logoHref = isDashboardRoute ? "/dashboard" : "/";
+  const logoHref = isDashboardRoute ? "/dashboard/projects" : "/";
 
   const [sticky, setSticky] = useState(false);
   const handleStickyNavbar = useCallback(() => {
@@ -84,11 +85,11 @@ const Header = () => {
       return pathname === path;
     }
 
-    if (path.includes("tab=account")) {
-      return activeDashboardTab === "account";
+    if (path.startsWith("/dashboard/account")) {
+      return pathname.startsWith("/dashboard/account");
     }
 
-    return activeDashboardTab === "projects";
+    return pathname.startsWith("/dashboard/projects");
   };
 
   return (
@@ -282,7 +283,7 @@ const Header = () => {
                 <div className="hidden items-center gap-3 lg:flex">
                   {!isDashboardRoute ? (
                     <Link
-                      href="/dashboard"
+                      href="/dashboard/projects"
                       className="rounded-sm border px-4 py-2 text-sm font-medium transition-colors hover:text-[#00b3aa]"
                       style={{ borderColor: `${colors.quinary}30` }}
                     >
@@ -507,16 +508,6 @@ const Header = () => {
                       >
                         {isAuthenticated ? (
                           <div className="space-y-3">
-                            {!isDashboardRoute ? (
-                              <Link
-                                href="/dashboard"
-                                onClick={() => setNavbarOpen(false)}
-                                className="flex w-full items-center justify-center rounded-sm border px-4 py-3 text-sm font-medium transition-all duration-300 hover:text-[#00b3aa]"
-                                style={{ borderColor: `${colors.quinary}30` }}
-                              >
-                                Dashboard
-                              </Link>
-                            ) : null}
                             <SignOutButton
                               className="flex w-full items-center justify-center rounded-sm bg-[#033a6d] px-4 py-3 text-sm font-medium text-white transition-all duration-300 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                               redirectTo="/login"

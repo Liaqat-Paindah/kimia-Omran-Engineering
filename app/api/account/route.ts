@@ -10,7 +10,7 @@ const accountSchema = z.object({
   firstName: z.string().trim().min(2, "First name is required."),
   lastName: z.string().trim().min(2, "Last name is required."),
   email: z.string().trim().email("A valid email is required."),
-  avatar: z.string().trim().min(1, "Avatar image is required."),
+  avatar: z.string().trim().optional().default(""),
 });
 
 async function requireAdmin() {
@@ -106,8 +106,10 @@ export async function PATCH(request: Request) {
   const user = await User.findByIdAndUpdate(
     session.user._id,
     {
-      ...parsed.data,
+      first_name: parsed.data.firstName,
+      last_name: parsed.data.lastName,
       email: parsed.data.email.toLowerCase(),
+      avatar: parsed.data.avatar,
     },
     { new: true },
   );
