@@ -23,6 +23,9 @@ export default function ProjectListPage({
   const [isRefreshing, startTransition] = useTransition();
   const [search, setSearch] = useState("");
   const [projects, setProjects] = useState(initialProjects);
+  const [projectToDelete, setProjectToDelete] =
+    useState<DashboardProject | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const deferredSearch = useDeferredValue(search);
 
@@ -56,46 +59,114 @@ export default function ProjectListPage({
     router.push("/dashboard/projects/new");
   };
 
-  const handleDelete = (projectId: string) => {
-    showToast({
-      title: "Delete this project?",
-      description: "This action permanently removes the project record.",
-      variant: "warning",
-      actionLabel: "Delete",
-      persistent: true,
-      onAction: async () => {
-        const response = await fetch(`/api/projects/${projectId}`, {
-          method: "DELETE",
-        });
+  const handleDelete = (project: DashboardProject) => {
+    setProjectToDelete(project);
+  };
 
-        const payload = (await response.json()) as { message?: string };
+  const handleDeleteCancel = () => {
+    if (isDeleting) {
+      return;
+    }
 
-        if (!response.ok) {
-          showToast({
-            title: "Delete failed",
-            description: payload.message ?? "Unable to delete the project.",
-            variant: "error",
-          });
-          return;
-        }
+    setProjectToDelete(null);
+  };
 
-        setProjects((current) =>
-          current.filter((project) => project.id !== projectId),
-        );
+  const handleDeleteConfirm = async () => {
+    if (!projectToDelete || isDeleting) {
+      return;
+    }
 
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`/api/projects/${projectToDelete.id}`, {
+        method: "DELETE",
+      });
+
+      const payload = (await response.json()) as { message?: string };
+
+      if (!response.ok) {
         showToast({
-          title: "Project deleted",
-          description: payload.message ?? "Project deleted successfully.",
-          variant: "success",
+          title: "Delete failed",
+          description: payload.message ?? "Unable to delete the project.",
+          variant: "error",
         });
-        refreshPage();
-      },
-    });
+        return;
+      }
+
+      setProjects((current) =>
+        current.filter((project) => project.id !== projectToDelete.id),
+      );
+
+      showToast({
+        title: "Project deleted",
+        description: payload.message ?? "Project deleted successfully.",
+        variant: "success",
+      });
+
+      setProjectToDelete(null);
+      refreshPage();
+    } catch {
+      showToast({
+        title: "Delete failed",
+        description: "Unable to delete the project right now. Please try again.",
+        variant: "error",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
     <>
-      <ToastStack toasts={toasts} onDismiss={dismissToast} />
+      <ToastStack toasts={toasts} z-9999 onDismiss={dismissToast} />
+
+      {projectToDelete ? (
+        <div className="fixed inset-0 z-9999 flex items-center justify-center bg-slate-950/50 px-4">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-project-title"
+            className="w-full max-w-md rounded-sm border border-slate-200 bg-white p-6 text-center shadow-2xl dark:border-slate-800 dark:bg-slate-950"
+          >
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 text-rose-600 dark:bg-rose-950/60 dark:text-rose-300">
+              <Trash2 className="h-5 w-5" />
+            </div>
+            <h3
+              id="delete-project-title"
+              className="mt-4 text-lg font-semibold text-slate-950 dark:text-slate-50"
+            >
+              Delete this project?
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
+              Are you sure you want to delete{" "}
+              <span className="font-semibold text-slate-900 dark:text-slate-100">
+                {projectToDelete.name}
+              </span>
+              ? This action cannot be undone.
+            </p>
+            <div className="mt-6 flex items-center justify-center gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleDeleteCancel}
+                disabled={isDeleting}
+                className="min-w-24 rounded-sm"
+              >
+                No
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleDeleteConfirm}
+                disabled={isDeleting}
+                className="min-w-24 rounded-sm"
+              >
+                {isDeleting ? "Deleting..." : "Yes"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <section className="rounded-sm border border-slate-200/80 p-6 shadow-sm dark:border-slate-800">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -159,7 +230,7 @@ export default function ProjectListPage({
                   </th>
                   <th
                     scope="col"
-                    className="relative px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400"
+                    className="relative px-6 py-4 text-center text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400"
                   >
                     Action
                   </th>
@@ -206,8 +277,8 @@ export default function ProjectListPage({
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600 dark:text-slate-300">
                       {formatDashboardDate(project.endDate)}
                     </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                      <div className="flex gap-2">
+                    <td className="whitespace-nowrap px-6 py-4 text-sm font-medium">
+                      <div className="flex items-center justify-center gap-2">
                         <Button
                           asChild
                           type="button"
@@ -225,7 +296,7 @@ export default function ProjectListPage({
                           variant="destructive"
                           size="sm"
                           className="rounded-sm"
-                          onClick={() => handleDelete(project.id)}
+                          onClick={() => handleDelete(project)}
                         >
                           <Trash2 className="h-3 w-3 mr-1" />
                           Delete
