@@ -1,86 +1,84 @@
-import NextAuth, { type NextAuthConfig } from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import { z } from "zod";
-import User from "@/models/user";
-import { ConnectDB } from "@/lib/config";
+import "server-only";
 
-const credentialsSchema = z.object({
-  email: z.string().email().trim().toLowerCase(),
-  password: z.string().min(6),
-});
+import type { Adapter } from "@auth/core/adapters";
+import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import { randomBytes, randomUUID } from "node:crypto";
+import NextAuth from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
 
-function getStringValue(value: unknown, fallback = "") {
-  return typeof value === "string" ? value : fallback;
-}
+import client from "@/lib/mongoDB";
 
-function getNullableStringValue(value: unknown) {
-  return typeof value === "string" ? value : null;
-}
-
-const authConfig: NextAuthConfig = {
-  trustHost: true,
+export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: {
-    signIn: "/login",
-    error: "/login",
+    signIn: "/auth/login",
+    error: "/auth/login",
   },
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60,
     updateAge: 24 * 60 * 60,
+    generateSessionToken: () => {
+      return randomUUID?.() ?? randomBytes(32).toString("hex");
+    },
   },
+  // The adapter currently resolves a nested copy of @auth/core in this repo.
+  // Casting keeps the config aligned until dependencies are deduped.
+  adapter: MongoDBAdapter(client) as Adapter,
   providers: [
-    Credentials({
+    CredentialsProvider({
       name: "Credentials",
       credentials: {
         email: {
-          label: "Email",
+          label: "email",
           type: "email",
-          placeholder: "admin@kimiaomran.com",
+          placeholder: "jsmith@Ayandaha.com",
         },
-        password: {
-          label: "Password",
-          type: "password",
-          placeholder: "******",
-        },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const parsedCredentials = credentialsSchema.safeParse(credentials);
-
-        if (!parsedCredentials.success) {
+        if (
+          !credentials ||
+          typeof credentials.email !== "string" ||
+          typeof credentials.password !== "string"
+        ) {
           return null;
         }
 
-        await ConnectDB();
+        const authUrl = process.env.AUTH_URL ?? process.env.NEXTAUTH_URL;
 
-        const user = await User.findOne({
-          email: parsedCredentials.data.email,
+        if (!authUrl) {
+          return null;
+        }
+
+        const response = await fetch(`${authUrl}/api/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: credentials.email,
+            password: credentials.password,
+          }),
         });
 
-        if (!user) {
+        const payload = await response.json();
+
+        if (!response.ok || !payload?.user) {
           return null;
         }
 
-        const isValidPassword = await user.comparePassword(
-          parsedCredentials.data.password,
-        );
-
-        if (!isValidPassword) {
-          return null;
-        }
-
-        const firstName = user.firstName?.trim() ?? "";
-        const lastName = user.lastName?.trim() ?? "";
-        const fullName = [firstName, lastName].filter(Boolean).join(" ");
+        const firstName = payload.user.firstName ?? "";
+        const lastName = payload.user.lastName ?? "";
+        const avatar = payload.user.avatar ?? null;
 
         return {
-          id: user._id.toString(),
-          email: user.email,
-          name: fullName || user.email,
-          image: user.avatar ?? null,
+          id: payload.user._id,
+          _id: payload.user._id,
+          email: payload.user.email,
           firstName,
           lastName,
-          role: user.role ?? "user",
-          avatar: user.avatar ?? null,
+          role: payload.user.role,
+          avatar,
+          name: [firstName, lastName].filter(Boolean).join(" ") || null,
+          image: avatar,
         };
       },
     }),
@@ -88,43 +86,31 @@ const authConfig: NextAuthConfig = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.role = user.role;
-        token.firstName = user.firstName;
-        token.lastName = user.lastName;
-        token.avatar = user.avatar;
-        token.name = user.name;
-        token.picture = user.image;
+        token._id = user._id;
+        token.email = user.email ?? token.email;
+        token.firstName = user.firstName ?? null;
+        token.lastName = user.lastName ?? null;
+        token.avatar = user.avatar ?? null;
+        token.name =
+          [user.firstName, user.lastName].filter(Boolean).join(" ") ||
+          token.name;
+        token.picture = user.avatar ?? token.picture;
       }
 
       return token;
     },
+
     async session({ session, token }) {
       if (session.user) {
-        const firstName = getStringValue(token.firstName);
-        const lastName = getStringValue(token.lastName);
-
-        session.user.id = getStringValue(token.id);
-        session.user.role = getStringValue(token.role, "user");
-        session.user.firstName = firstName;
-        session.user.lastName = lastName;
-        session.user.avatar = getNullableStringValue(token.avatar);
-        session.user.name =
-          getStringValue(token.name) ||
-          [firstName, lastName].filter(Boolean).join(" ") ||
-          session.user.email ??
-          "User";
-        session.user.image = getNullableStringValue(token.picture);
+        session.user._id = token._id;
+        session.user.email = token.email ?? session.user.email ?? null;
+        session.user.firstName =
+          token.firstName ?? session.user.firstName ?? null;
+        session.user.lastName = token.lastName ?? session.user.lastName ?? null;
+        session.user.avatar = token.avatar ?? null;
       }
 
       return session;
     },
   },
-};
-
-export const {
-  handlers: { GET, POST },
-  auth,
-  signIn,
-  signOut,
-} = NextAuth(authConfig);
+});
