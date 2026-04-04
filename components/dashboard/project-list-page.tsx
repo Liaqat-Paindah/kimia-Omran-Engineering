@@ -52,6 +52,10 @@ export default function ProjectListPage({
 
   const refreshPage = () => startTransition(() => router.refresh());
 
+  const handleNewProject = () => {
+    router.push("/dashboard/projects/new");
+  };
+
   const handleDelete = (projectId: string) => {
     showToast({
       title: "Delete this project?",
@@ -93,14 +97,11 @@ export default function ProjectListPage({
     <>
       <ToastStack toasts={toasts} onDismiss={dismissToast} />
 
-      <section className="rounded-sm border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+      <section className="rounded-sm border border-slate-200/80 p-6 shadow-sm dark:border-slate-800">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">
-              Project Listing
-            </p>
             <h2 className="mt-2 text-2xl font-semibold text-slate-950 dark:text-slate-50">
-              Manage project records
+              Project List
             </h2>
           </div>
 
@@ -114,76 +115,127 @@ export default function ProjectListPage({
               placeholder="Search projects"
             />
           </label>
+          <button
+            type="button"
+            onClick={handleNewProject}
+            className="rounded-sm bg-[#00b3aa] px-4 py-2 text-sm font-semibold text-white hover:bg-[#009d94] focus:outline-none focus:ring-2 focus:ring-[#00b3aa] focus:ring-offset-2 dark:bg-[#009d94] dark:hover:bg-[#008a82] dark:focus:ring-[#009d94]"
+          >
+            Add Project
+          </button>
         </div>
 
-        <div className="mt-6 space-y-4">
+        <div className="mt-6 overflow-x-auto">
           {filteredProjects.length === 0 ? (
             <div className="rounded-sm border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
               No projects found.
             </div>
           ) : (
-            filteredProjects.map((project) => (
-              <article
-                key={project.id}
-                className="rounded-sm border border-slate-200 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-900/70"
-              >
-                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                  <div>
-                    <h3 className="text-xl font-semibold text-slate-950 dark:text-slate-50">
-                      {project.name}
-                    </h3>
-                    <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                      {project.slug} / {project.constructionType}
-                    </p>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    <Button asChild type="button" variant="outline" className="rounded-sm px-4">
-                      <Link href={`/dashboard/projects/${project.id}/edit`}>
-                        <Edit3 className="h-4 w-4" />
-                        Edit
-                      </Link>
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      className="rounded-sm px-4"
-                      onClick={() => handleDelete(project.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      Delete
-                    </Button>
-                  </div>
-                </div>
-
-                {project.image ? (
-                  <Image
-                    src={project.image}
-                    alt={project.name}
-                    width={1200}
-                    height={640}
-                    unoptimized
-                    className="mt-4 h-44 w-full rounded-sm object-cover"
-                  />
-                ) : null}
-
-                <p className="mt-4 text-sm leading-7 text-slate-600 dark:text-slate-300">
-                  {project.description}
-                </p>
-
-                <div className="mt-4 grid gap-3 md:grid-cols-3">
-                  <div className="rounded-sm bg-white px-4 py-3 text-sm text-slate-700 dark:bg-slate-950 dark:text-slate-200">
-                    {project.location}
-                  </div>
-                  <div className="rounded-sm bg-white px-4 py-3 text-sm text-slate-700 dark:bg-slate-950 dark:text-slate-200">
-                    {formatDashboardDate(project.startDate)}
-                  </div>
-                  <div className="rounded-sm bg-white px-4 py-3 text-sm text-slate-700 dark:bg-slate-950 dark:text-slate-200">
-                    {formatDashboardDate(project.endDate)}
-                  </div>
-                </div>
-              </article>
-            ))
+            <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+              <thead className="bg-slate-50 dark:bg-slate-900/70">
+                <tr>
+                  <th
+                    scope="col"
+                    className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400"
+                  >
+                    Project
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400"
+                  >
+                    Location
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400"
+                  >
+                    Start Date
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400"
+                  >
+                    End Date
+                  </th>
+                  <th
+                    scope="col"
+                    className="relative px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400"
+                  >
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 bg-white dark:divide-slate-800 dark:bg-slate-950">
+                {filteredProjects.map((project) => (
+                  <tr
+                    key={project.id}
+                    className="hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors"
+                  >
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <div className="flex items-center">
+                        {project.image ? (
+                          <div className="h-10 w-10 shrink-0">
+                            <Image
+                              src={project.image}
+                              alt={project.name}
+                              width={40}
+                              height={40}
+                              unoptimized
+                              className="h-10 w-10 rounded-sm object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="h-10 w-10 shrink-0 rounded-sm bg-slate-100 dark:bg-slate-800"></div>
+                        )}
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                            {project.name}
+                          </div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400">
+                            {project.constructionType}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600 dark:text-slate-300">
+                      {project.location}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600 dark:text-slate-300">
+                      {formatDashboardDate(project.startDate)}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600 dark:text-slate-300">
+                      {formatDashboardDate(project.endDate)}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                      <div className="flex gap-2">
+                        <Button
+                          asChild
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="rounded-sm"
+                        >
+                          <Link href={`/dashboard/projects/${project.id}/edit`}>
+                            <Edit3 className="h-3 w-3 mr-1" />
+                            Edit
+                          </Link>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          className="rounded-sm"
+                          onClick={() => handleDelete(project.id)}
+                        >
+                          <Trash2 className="h-3 w-3 mr-1" />
+                          Delete
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           )}
         </div>
 

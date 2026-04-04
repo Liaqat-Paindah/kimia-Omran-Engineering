@@ -72,23 +72,23 @@ export default function AdminLoginPageClient() {
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-12">
       <div className="absolute inset-0 bg-[linear-gradient(rgba(0,179,170,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,179,170,0.03)_1px,transparent_1px)] bg-size-[32px_32px]" />
       <div
-        className="absolute top-16 left-8 h-72 w-72 rounded-full blur-3xl"
+        className="absolute top-16 left-8 h-72 w-72 rounded-sm blur-3xl"
         style={{ background: `${colors.primary}22` }}
       />
       <div
-        className="absolute right-8 bottom-16 h-72 w-72 rounded-full blur-3xl"
+        className="absolute right-8 bottom-16 h-72 w-72 rounded-sm blur-3xl"
         style={{ background: `${colors.quinary}22` }}
       />
 
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative w-full max-w-md rounded-[2rem] border bg-white p-8 shadow-2xl dark:bg-[#011b2b]"
+        className="relative w-full max-w-md rounded-sm border bg-white p-8 shadow-2xl dark:bg-[#011b2b]"
         style={{ borderColor: `${colors.quinary}20` }}
       >
         <div className="mb-6">
           <div
-            className="inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em]"
+            className="inline-flex rounded-sm px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em]"
             style={{
               background: `${colors.quinary}10`,
               color: colors.quinary,
@@ -110,18 +110,18 @@ export default function AdminLoginPageClient() {
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder="Email address"
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#00b3aa] dark:border-[#064e78] dark:bg-[#011b2b] dark:text-white"
+            className="w-full rounded-sm border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#00b3aa] dark:border-[#064e78] dark:bg-[#011b2b] dark:text-white"
           />
           <input
             type="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             placeholder="Password"
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#00b3aa] dark:border-[#064e78] dark:bg-[#011b2b] dark:text-white"
+            className="w-full rounded-sm border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#00b3aa] dark:border-[#064e78] dark:bg-[#011b2b] dark:text-white"
           />
 
           {activeAuthError ? (
-            <p className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+            <p className="rounded-sm border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
               {activeAuthError}
             </p>
           ) : null}
@@ -148,7 +148,7 @@ export default function AdminLoginPageClient() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full rounded-2xl px-4 py-3 text-sm font-semibold text-white"
+            className="w-full rounded-sm px-4 py-3 text-sm font-semibold text-white"
             style={{ background: colors.gradient }}
           >
             {isLoading ? "Signing in..." : "Go to dashboard"}
