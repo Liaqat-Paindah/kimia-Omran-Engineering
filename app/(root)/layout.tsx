@@ -10,7 +10,7 @@ export default function RootLayout({
   return (
     <>
       <Header />
-      <div className="flex w-full flex-1">{children}</div>
+      <div className="w-full">{children}</div>
       <Footer />
     </>
   );

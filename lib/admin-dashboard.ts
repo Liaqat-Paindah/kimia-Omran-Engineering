@@ -21,6 +21,25 @@ export type DashboardAccount = {
   role: string;
 };
 
+export type DashboardSection = "projects" | "account";
+
+export type DashboardProjectForm = {
+  name: string;
+  slug: string;
+  description: string;
+  image: string;
+  startDate: string;
+  endDate: string;
+  location: string;
+  constructionType: string;
+};
+
+export type DashboardPasswordForm = {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+};
+
 export function createProjectSlug(value: string) {
   return value
     .toLowerCase()
@@ -28,6 +47,21 @@ export function createProjectSlug(value: string) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .replace(/-{2,}/g, "-");
+}
+
+export function getDateInputValue(value: string) {
+  return value.slice(0, 10);
+}
+
+export function formatDashboardDate(value: string) {
+  const isoDate = getDateInputValue(value);
+  const [year, month, day] = isoDate.split("-");
+
+  if (!year || !month || !day) {
+    return value;
+  }
+
+  return `${day}/${month}/${year}`;
 }
 
 export function serializeProject(project: {
