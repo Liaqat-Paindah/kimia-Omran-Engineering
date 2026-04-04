@@ -2,12 +2,11 @@
 
 import { useDeferredValue, useState, useTransition } from "react";
 import { ShieldCheck } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 
 import SignOutButton from "@/components/sign-out-button";
 import AccountSettingsSection from "@/components/dashboard/account-settings-section";
-import DashboardMenubar from "@/components/dashboard/dashboard-menubar";
 import ProjectsSection from "@/components/dashboard/projects-section";
 import ToastStack, { type ToastItem } from "@/components/ui/toast-stack";
 import {
@@ -45,10 +44,9 @@ export default function AdminDashboard({
   initialAccount: DashboardAccount;
 }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { update } = useSession();
   const [isRefreshing, startTransition] = useTransition();
-  const [activeSection, setActiveSection] =
-    useState<DashboardSection>("projects");
   const [projects, setProjects] = useState(initialProjects);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -63,6 +61,8 @@ export default function AdminDashboard({
   const [isPasswordSaving, setIsPasswordSaving] = useState(false);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const deferredSearch = useDeferredValue(search);
+  const activeSection: DashboardSection =
+    searchParams.get("tab") === "account" ? "account" : "projects";
 
   const filteredProjects = !deferredSearch.trim()
     ? projects
@@ -74,6 +74,21 @@ export default function AdminDashboard({
       );
 
   const refreshDashboard = () => startTransition(() => router.refresh());
+
+  const setActiveSection = (section: DashboardSection) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (section === "projects") {
+      params.delete("tab");
+    } else {
+      params.set("tab", section);
+    }
+
+    const query = params.toString();
+    router.replace(query ? `/dashboard?${query}` : "/dashboard", {
+      scroll: false,
+    });
+  };
 
   const showToast = (toast: Omit<ToastItem, "id">) => {
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -350,11 +365,6 @@ export default function AdminDashboard({
     <main className="min-h-screen bg-[linear-gradient(180deg,#effaf7_0%,#f8fafc_45%,#eef4ff_100%)] px-4 py-8 dark:bg-[linear-gradient(180deg,#020617_0%,#0f172a_45%,#111827_100%)] sm:px-6 lg:px-8">
       <ToastStack toasts={toasts} onDismiss={dismissToast} />
       <div className="mx-auto max-w-7xl space-y-6">
-        <DashboardMenubar
-          activeSection={activeSection}
-          onChange={setActiveSection}
-        />
-
         <section className="rounded-sm bg-slate-950 px-6 py-8 text-white shadow-[0_30px_80px_rgba(3,58,109,0.28)] dark:border dark:border-slate-800">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>

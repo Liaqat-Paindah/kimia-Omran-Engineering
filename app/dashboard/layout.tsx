@@ -1,8 +1,7 @@
 import { Suspense } from "react";
-import Footer from "@/components/navigation/footer";
 import Header from "@/components/navigation/header";
 
-export default function RootLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -13,7 +12,6 @@ export default function RootLayout({
         <Header />
       </Suspense>
       <div className="w-full">{children}</div>
-      <Footer />
     </>
   );
 }

@@ -1,13 +1,14 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import SignOutButton from "@/components/sign-out-button";
 import menuData from "./menuData";
 import ThemeToggler from "./providers/toggleMode";
+import type { Menu } from "@/types/menu";
 
 // Color palette matching your design
 const colors = {
@@ -21,6 +22,16 @@ const colors = {
   accent: "#00b3aa",
 };
 
+const dashboardMenuData: Menu[] = [
+  { id: 101, title: "Project", path: "/dashboard", newTab: false },
+  {
+    id: 102,
+    title: "Account Setting",
+    path: "/dashboard?tab=account",
+    newTab: false,
+  },
+];
+
 const Header = () => {
   const [navbarOpen, setNavbarOpen] = useState(false);
   const navbarToggleHandler = () => {
@@ -28,10 +39,16 @@ const Header = () => {
   };
 
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { data: session, status } = useSession();
   const isAuthenticated = status === "authenticated" && !!session?.user;
   const sessionLabel =
     session?.user.firstName || session?.user.name || "Dashboard";
+  const isDashboardRoute = pathname.startsWith("/dashboard");
+  const activeDashboardTab =
+    searchParams.get("tab") === "account" ? "account" : "projects";
+  const activeMenuItems = isDashboardRoute ? dashboardMenuData : menuData;
+  const logoHref = isDashboardRoute ? "/dashboard" : "/";
 
   const [sticky, setSticky] = useState(false);
   const handleStickyNavbar = useCallback(() => {
@@ -57,6 +74,22 @@ const Header = () => {
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
+
+  const isMenuItemActive = (path?: string) => {
+    if (!path) {
+      return false;
+    }
+
+    if (!isDashboardRoute) {
+      return pathname === path;
+    }
+
+    if (path.includes("tab=account")) {
+      return activeDashboardTab === "account";
+    }
+
+    return activeDashboardTab === "projects";
+  };
 
   return (
     <>
@@ -84,7 +117,7 @@ const Header = () => {
           <div className="flex items-center justify-between">
             {/* Logo Section */}
             <div className="relative group">
-              <Link href="/" className="relative block ">
+              <Link href={logoHref} className="relative block ">
                 {/* Glow Effect */}
                 <div
                   className="absolute inset-0 rounded-sm blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500"
@@ -104,7 +137,7 @@ const Header = () => {
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex lg:items-center">
               <ul className="flex items-center space-x-1">
-                {menuData.map((menuItem, index) => (
+                {activeMenuItems.map((menuItem, index) => (
                   <li key={index} className="relative group">
                     {menuItem.path ? (
                       <Link
@@ -113,14 +146,14 @@ const Header = () => {
                           relative px-4 py-2.5 text-sm font-medium rounded-sm
                           transition-all duration-300 inline-flex items-center
                           ${
-                            pathname === menuItem.path
+                            isMenuItemActive(menuItem.path as string)
                               ? "text-[#00b3aa]"
                               : "text-gray-700 hover:text-[#00b3aa] dark:text-gray-300 dark:hover:text-[#00b3aa]"
                           }
                         `}
                       >
                         {/* Active Indicator */}
-                        {pathname === menuItem.path && (
+                        {isMenuItemActive(menuItem.path as string) && (
                           <motion.span
                             layoutId="activeNav"
                             className="absolute inset-0 rounded-sm"
@@ -132,7 +165,9 @@ const Header = () => {
                         {/* Underline Effect */}
                         <span
                           className={`absolute   ${
-                            pathname === menuItem.path ? "w-1/2" : ""
+                            isMenuItemActive(menuItem.path as string)
+                              ? "w-1/2"
+                              : ""
                           }`}
                           style={{ background: colors.gradient }}
                         />
@@ -245,13 +280,22 @@ const Header = () => {
                 />
               ) : isAuthenticated ? (
                 <div className="hidden items-center gap-3 lg:flex">
-                  <Link
-                    href="/dashboard"
-                    className="rounded-sm border px-4 py-2 text-sm font-medium transition-colors hover:text-[#00b3aa]"
-                    style={{ borderColor: `${colors.quinary}30` }}
-                  >
-                    {sessionLabel}
-                  </Link>
+                  {!isDashboardRoute ? (
+                    <Link
+                      href="/dashboard"
+                      className="rounded-sm border px-4 py-2 text-sm font-medium transition-colors hover:text-[#00b3aa]"
+                      style={{ borderColor: `${colors.quinary}30` }}
+                    >
+                      {sessionLabel}
+                    </Link>
+                  ) : (
+                    <span
+                      className="rounded-sm border px-4 py-2 text-sm font-medium"
+                      style={{ borderColor: `${colors.quinary}30` }}
+                    >
+                      {sessionLabel}
+                    </span>
+                  )}
                   <SignOutButton
                     className="rounded-sm bg-[#033a6d] px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                     redirectTo="/login"
@@ -355,7 +399,7 @@ const Header = () => {
                 <div className="relative p-4">
                   <nav>
                     <ul className="space-y-1">
-                      {menuData.map((menuItem, index) => (
+                      {activeMenuItems.map((menuItem, index) => (
                         <li key={index}>
                           {menuItem.path ? (
                             <Link
@@ -365,13 +409,13 @@ const Header = () => {
                                 flex items-center py-3 px-3 rounded-sm text-sm font-medium
                                 transition-all duration-300
                                 ${
-                                  pathname === menuItem.path
+                                  isMenuItemActive(menuItem.path as string)
                                     ? "text-[#00b3aa]"
                                     : "text-gray-700 hover:text-[#00b3aa] dark:text-gray-300 dark:hover:text-[#00b3aa]"
                                 }
                               `}
                             >
-                              {pathname === menuItem.path && (
+                              {isMenuItemActive(menuItem.path as string) && (
                                 <motion.div
                                   layoutId="mobileActive"
                                   className="absolute left-0 w-0.5 h-8"
@@ -463,14 +507,16 @@ const Header = () => {
                       >
                         {isAuthenticated ? (
                           <div className="space-y-3">
-                            <Link
-                              href="/dashboard"
-                              onClick={() => setNavbarOpen(false)}
-                              className="flex w-full items-center justify-center rounded-sm border px-4 py-3 text-sm font-medium transition-all duration-300 hover:text-[#00b3aa]"
-                              style={{ borderColor: `${colors.quinary}30` }}
-                            >
-                              Dashboard
-                            </Link>
+                            {!isDashboardRoute ? (
+                              <Link
+                                href="/dashboard"
+                                onClick={() => setNavbarOpen(false)}
+                                className="flex w-full items-center justify-center rounded-sm border px-4 py-3 text-sm font-medium transition-all duration-300 hover:text-[#00b3aa]"
+                                style={{ borderColor: `${colors.quinary}30` }}
+                              >
+                                Dashboard
+                              </Link>
+                            ) : null}
                             <SignOutButton
                               className="flex w-full items-center justify-center rounded-sm bg-[#033a6d] px-4 py-3 text-sm font-medium text-white transition-all duration-300 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                               redirectTo="/login"
