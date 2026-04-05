@@ -7,9 +7,6 @@ export default async function EditDashboardAccountPage() {
 
   return (
     <DashboardPageShell
-      badge="Account"
-      title="Edit account details"
-      description="Update the administrator name, email address, and avatar reference on a dedicated profile page."
       account={account}
     >
       <AccountDetailsFormPage initialAccount={account} />
