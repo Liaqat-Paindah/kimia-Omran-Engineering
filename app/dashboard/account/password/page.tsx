@@ -7,9 +7,6 @@ export default async function DashboardAccountPasswordPage() {
 
   return (
     <DashboardPageShell
-      badge="Account"
-      title="Change password"
-      description="Use a dedicated security page to update the current administrator password."
       account={account}
     >
       <AccountPasswordFormPage />
