@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { serializeProject } from "@/lib/admin-dashboard";
 import { ConnectDB } from "@/lib/config";
 import Project from "@/models/project";
 
@@ -10,7 +11,7 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      projects,
+      projects: projects.map((project) => serializeProject(project)),
     });
   } catch {
     return NextResponse.json(

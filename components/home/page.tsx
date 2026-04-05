@@ -10,6 +10,7 @@ import {
 import Image from "next/image";
 import { UseGetProjects } from "@/hooks/useProject";
 import Loading from "@/app/loading";
+import { type DashboardProject } from "@/lib/admin-dashboard";
 
 // Color palette
 const colors = {
@@ -210,6 +211,8 @@ const ProjectCard = ({
           src={image}
           alt={title}
           fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          unoptimized
           className="object-cover transition-transform duration-700 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent" />
@@ -272,27 +275,8 @@ export default function KimiaOmranLanding() {
     },
   ];
 
-  const projects = [
-    {
-      title: "Central Business Tower",
-      category: "Commercial",
-      image:
-        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070",
-    },
-    {
-      title: "Coastal Highway Bridge",
-      category: "Infrastructure",
-      image:
-        "https://images.unsplash.com/photo-1519003722824-194d4455a60c?q=80&w=2070",
-    },
-    {
-      title: "Green Residential Complex",
-      category: "Residential",
-      image:
-        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=2070",
-    },
-  ];
   const { data, isPending, error } = UseGetProjects();
+  const projects: DashboardProject[] = data ?? [];
   if (isPending) {
     return <Loading />;
   }
@@ -385,23 +369,30 @@ export default function KimiaOmranLanding() {
             className="text-center mb-12"
           >
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              Featured <span style={{ color: colors.quinary }}>Projects</span>
+              Recent <span style={{ color: colors.quinary }}>Projects</span>
             </h2>
             <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              Showcasing our finest work across various sectors
+              Explore the latest projects completed across our construction
+              portfolio
             </p>
           </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {projects.map((project, index) => (
-              <ProjectCard
-                key={index}
-                title={project.title}
-                category={project.category}
-                image={project.image}
-                index={index}
-              />
-            ))}
-          </div>
+          {projects.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {projects.map((project, index) => (
+                <ProjectCard
+                  key={project.id || project.slug || project.name}
+                  title={project.name}
+                  category={project.constructionType}
+                  image={project.image}
+                  index={index}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-sm border border-dashed border-gray-300 dark:border-gray-700 px-6 py-12 text-center text-sm text-gray-600 dark:text-gray-400">
+              No recent projects are available right now.
+            </div>
+          )}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
