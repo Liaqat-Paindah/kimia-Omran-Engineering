@@ -373,43 +373,15 @@ export default function KimiaOmranProjects() {
         onClose={() => setSelectedProject(null)}
       />
 
-      <section className="relative overflow-hidden py-24 md:py-32">
-        <div className="absolute inset-0">
-          <Image
-            src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=2070"
-            alt="Projects Hero"
-            fill
-            className="object-cover"
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `linear-gradient(135deg, ${colors.primary}CC, ${colors.secondary}CC)`,
-            }}
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(0,179,170,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,179,170,0.1)_1px,transparent_1px)] bg-size-[40px_40px]" />
-        </div>
+      <section className="relative overflow-hidden">
         <div className="relative container mx-auto px-4 text-center sm:px-6 lg:px-8">
           <motion.div initial="hidden" animate="visible" className="mx-auto max-w-3xl">
-            <motion.div
-              custom={0}
-              variants={textVariants}
-              className="mb-6 inline-flex items-center gap-2 rounded-sm px-3 py-1"
-              style={{
-                background: `${colors.quinary}20`,
-                border: `1px solid ${colors.quinary}`,
-              }}
-            >
-              <span className="text-xs font-mono" style={{ color: colors.quinary }}>
-                OUR PORTFOLIO
-              </span>
-            </motion.div>
             <motion.h1
               custom={1}
               variants={textVariants}
               className="mb-6 text-4xl font-bold text-white md:text-5xl lg:text-6xl"
             >
-              Featured <span style={{ color: colors.quinary }}>Projects</span>
+              Our <span style={{ color: colors.quinary }}>Projects</span>
             </motion.h1>
             <motion.p
               custom={2}
@@ -423,7 +395,7 @@ export default function KimiaOmranProjects() {
         </div>
       </section>
 
-      <section className="bg-white py-20 dark:bg-[#010a12]">
+      <section className=" py-5">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
