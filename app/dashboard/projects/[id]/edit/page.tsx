@@ -16,9 +16,6 @@ export default async function EditProjectPage({
 
   return (
     <DashboardPageShell
-      badge="Projects"
-      title="Edit project"
-      description="Update project content, replace its image, and keep the timeline and construction details current."
       account={account}
     >
       <ProjectFormPage

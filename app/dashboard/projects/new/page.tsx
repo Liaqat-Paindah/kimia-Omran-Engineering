@@ -7,9 +7,6 @@ export default async function NewProjectPage() {
 
   return (
     <DashboardPageShell
-      badge="Projects"
-      title="New project"
-      description="Create a project record with dates, construction type, location, and an attached image."
       account={account}
     >
       <ProjectFormPage mode="create" />
