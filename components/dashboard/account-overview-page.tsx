@@ -6,7 +6,6 @@ import {
   User,
   Mail,
   Shield,
-  Edit2,
   Save,
   X,
   Camera,
@@ -133,7 +132,7 @@ export default function AccountOverviewPage({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full bg-white dark:bg-transparent rounded-sm overflow-hidden border border-gray-200 dark:border-white/10"
+      className="w-full bg-white  dark:bg-transparent rounded-sm overflow-hidden border border-gray-200 dark:border-white/10"
     >
       {/* Header Section */}
       <div className="px-4 sm:px-6 py-5 sm:py-6 border-b border-gray-200 dark:border-white/10">
@@ -154,15 +153,7 @@ export default function AccountOverviewPage({
             </div>
           </div>
 
-          {isEditable && !isEditing && (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-white/5 rounded-sm hover:bg-gray-200 dark:hover:bg-white/10 transition-all duration-200"
-            >
-              <Edit2 className="w-3 h-3 sm:w-4 sm:h-4" />
-              Edit Profile
-            </button>
-          )}
+
 
           {isEditing && (
             <div className="flex items-center gap-2">
